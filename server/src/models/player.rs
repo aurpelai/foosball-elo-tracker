@@ -13,5 +13,4 @@ pub struct Player {
 #[diesel(table_name=crate::models::schema::player)]
 pub struct NewPlayer {
     pub name: String,
-    pub active: bool,
 }
