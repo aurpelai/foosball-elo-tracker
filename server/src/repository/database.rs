@@ -25,32 +25,32 @@ impl Database {
 
     // Loads all players
     pub fn get_players(&self) -> Vec<Player> {
-        players
+        player
             .load::<Player>(&mut self.pool.get().unwrap())
             .expect("Failed to get players.")
     }
 
     // Loads a single player using heir id
     pub fn get_player(&self, player_id: i32) -> Option<Player> {
-        players
+        player
             .find(player_id)
             .first::<Player>(&mut self.pool.get().unwrap())
             .ok()
     }
 
-    pub fn create_player(&self, player: NewPlayer) -> Result<Player, diesel::result::Error> {
-        diesel::insert_into(players)
-            .values(&player)
+    pub fn create_player(&self, new_player: NewPlayer) -> Result<Player, diesel::result::Error> {
+        diesel::insert_into(player)
+            .values(&new_player)
             .get_result(&mut self.pool.get().unwrap())
     }
 
     pub fn delete_player(&self, player_id: i32) -> Result<usize, diesel::result::Error> {
-        diesel::delete(players.filter(id.eq(player_id))).execute(&mut self.pool.get().unwrap())
+        diesel::delete(player.filter(id.eq(player_id))).execute(&mut self.pool.get().unwrap())
     }
 
-    pub fn update_player(&self, player: Player) -> Result<Player, diesel::result::Error> {
-        diesel::update(players.filter(id.eq(player.id)))
-            .set(&player)
+    pub fn update_player(&self, new_player: Player) -> Result<Player, diesel::result::Error> {
+        diesel::update(player.filter(id.eq(new_player.id)))
+            .set(&new_player)
             .get_result(&mut self.pool.get().unwrap())
     }
 }

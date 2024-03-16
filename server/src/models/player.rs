@@ -6,12 +6,12 @@ use serde::{Deserialize, Serialize};
 pub struct Player {
     pub id: i32,
     pub name: String,
-    pub active: Bool,
+    pub active: bool,
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone, Insertable)]
 #[diesel(table_name=crate::models::schema::player)]
-pub struct PlayerEvent {
+pub struct NewPlayer {
     pub name: String,
-    pub active: Bool,
+    pub active: bool,
 }
