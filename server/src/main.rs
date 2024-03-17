@@ -9,6 +9,7 @@ extern crate diesel_migrations;
 mod handlers;
 mod models;
 mod repository;
+mod routes;
 
 #[derive(Serialize)]
 pub struct Response {
@@ -48,7 +49,7 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .app_data(app_data.clone())
-            .configure(handlers::handlers::init_routes)
+            .configure(routes::configure_routes)
             .service(health)
             .default_service(web::route().to(not_found_error))
             .wrap(actix_web::middleware::Logger::default())

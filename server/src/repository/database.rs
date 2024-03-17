@@ -2,8 +2,11 @@ use diesel::prelude::*;
 use diesel::r2d2::{self, ConnectionManager};
 use dotenv::dotenv;
 
-use crate::models::player::{NewPlayer, Player};
 use crate::models::schema::players::dsl::*;
+use crate::models::schema::teams::dsl::*;
+
+use crate::models::player::{NewPlayer, Player};
+use crate::models::team::{NewTeam, Team};
 
 pub type DBPool = r2d2::Pool<ConnectionManager<PgConnection>>;
 
@@ -22,6 +25,8 @@ impl Database {
 
         Database { pool: result }
     }
+
+    // PLAYERS
 
     pub fn get_players(&self) -> Vec<Player> {
         players
@@ -50,5 +55,30 @@ impl Database {
         diesel::update(players.find(player.id))
             .set(&player)
             .get_result(&mut self.pool.get().unwrap())
+    }
+
+    // TEAMS
+
+    pub fn get_teams(&self) -> Vec<Team> {
+        teams
+            .load::<Team>(&mut self.pool.get().unwrap())
+            .expect("Failed to get teams.")
+    }
+
+    pub fn get_team(&self, team_id: i32) -> Option<Team> {
+        teams
+            .find(team_id)
+            .first::<Team>(&mut self.pool.get().unwrap())
+            .ok()
+    }
+
+    pub fn create_team(&self, new_team: NewTeam) -> Result<Team, diesel::result::Error> {
+        diesel::insert_into(teams)
+            .values(&new_team)
+            .get_result(&mut self.pool.get().unwrap())
+    }
+
+    pub fn delete_team(&self, team_id: i32) -> Result<usize, diesel::result::Error> {
+        diesel::delete(teams.find(team_id)).execute(&mut self.pool.get().unwrap())
     }
 }
