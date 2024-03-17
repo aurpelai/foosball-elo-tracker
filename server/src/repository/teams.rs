@@ -17,6 +17,25 @@ pub fn get_team(
     teams.find(team_id).first::<Team>(connection).ok()
 }
 
+pub fn get_team_by_players(
+    connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
+    data: NewTeam,
+) -> Option<Team> {
+    teams
+        .filter(
+            player_one_id
+                .eq(data.player_one_id)
+                .and(player_two_id.eq(data.player_two_id)),
+        )
+        .or_filter(
+            player_one_id
+                .eq(data.player_two_id)
+                .and(player_two_id.eq(data.player_one_id)),
+        )
+        .first::<Team>(connection)
+        .ok()
+}
+
 pub fn create_team(
     connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
     data: NewTeam,
@@ -26,6 +45,16 @@ pub fn create_team(
         .get_result(connection)
 }
 
+pub fn create_or_get_team(
+    connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
+    data: NewTeam,
+) -> Result<Team, diesel::result::Error> {
+    let existing_team = get_team_by_players(connection, data.clone());
+
+    match existing_team {
+        Some(team) => Ok(team),
+        None => create_team(connection, data.clone()),
+    }
 }
 
 pub fn delete_team(

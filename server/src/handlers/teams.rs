@@ -10,6 +10,8 @@ async fn get_teams(db: web::Data<Database>) -> HttpResponse {
     HttpResponse::Ok().json(result)
 }
 
+// TODO allow searching for teams with player ids
+
 #[get("/{id}")]
 async fn get_team(db: web::Data<Database>, path: web::Path<i32>) -> HttpResponse {
     let mut connection = db.pool.get().unwrap();
@@ -35,7 +37,7 @@ async fn delete_team(db: web::Data<Database>, path: web::Path<i32>) -> HttpRespo
 #[post("")]
 async fn create_team(db: web::Data<Database>, data: web::Json<NewTeam>) -> HttpResponse {
     let mut connection = db.pool.get().unwrap();
-    let result = teams::create_team(&mut connection, data.into_inner());
+    let result = teams::create_or_get_team(&mut connection, data.into_inner());
     match result {
         Ok(team) => HttpResponse::Ok().json(team),
         // TODO be more descriptive

@@ -54,6 +54,3 @@ async fn create_player(db: web::Data<Database>, data: web::Json<NewPlayer>) -> H
         Err(_) => HttpResponse::InternalServerError().body("Internal Server Error"),
     }
 }
-
-// TODO allow updating a player using only partial info, i.e. id and the updated data
-// This should probably be done using a post call (put is probably more semantic when used with full data)
