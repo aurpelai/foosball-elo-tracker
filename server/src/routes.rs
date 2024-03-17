@@ -16,7 +16,8 @@ pub fn configure_routes(cfg: &mut web::ServiceConfig) {
                 web::scope("/teams")
                     .service(handlers::teams::get_teams)
                     .service(handlers::teams::get_team)
-                    .service(handlers::teams::create_team),
+                    .service(handlers::teams::create_team)
+                    .service(handlers::teams::delete_team),
             ),
     );
 }
