@@ -2,7 +2,7 @@ use diesel::{AsChangeset, Insertable, Queryable};
 use serde::{Deserialize, Serialize};
 
 #[derive(Queryable, Serialize, Deserialize, Debug, Clone, AsChangeset, Insertable)]
-#[diesel(table_name=crate::models::schema::player)]
+#[diesel(table_name=crate::models::schema::players)]
 pub struct Player {
     pub id: i32,
     pub name: String,
@@ -10,7 +10,7 @@ pub struct Player {
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone, Insertable)]
-#[diesel(table_name=crate::models::schema::player)]
+#[diesel(table_name=crate::models::schema::players)]
 pub struct NewPlayer {
     pub name: String,
 }

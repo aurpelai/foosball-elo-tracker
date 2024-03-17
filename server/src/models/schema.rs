@@ -1,7 +1,7 @@
 // @generated automatically by Diesel CLI.
 
 diesel::table! {
-    player (id) {
+    players (id) {
         id -> Int4,
         name -> Text,
         active -> Bool,
