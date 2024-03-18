@@ -12,8 +12,7 @@ async fn get_all_teams(db: web::Data<Database>) -> HttpResponse {
 async fn create_team(db: web::Data<Database>, data: web::Json<NewTeam>) -> HttpResponse {
     match teams::find_or_insert_team(&mut db.pool.get().unwrap(), &data.into_inner()) {
         Ok(team) => HttpResponse::Ok().json(team),
-        // TODO be more descriptive
-        Err(_) => HttpResponse::InternalServerError().body("Internal Server Error"),
+        Err(_) => HttpResponse::InternalServerError().body("Error while creating team!"),
     }
 }
 
@@ -32,7 +31,6 @@ async fn get_team_by_id(db: web::Data<Database>, path: web::Path<i32>) -> HttpRe
 async fn delete_team_by_id(db: web::Data<Database>, path: web::Path<i32>) -> HttpResponse {
     match teams::delete_team(&mut db.pool.get().unwrap(), &path.into_inner()) {
         Ok(team) => HttpResponse::Ok().json(team),
-        // TODO be more descriptive
-        Err(_) => HttpResponse::InternalServerError().body("Internal Server Error"),
+        Err(_) => HttpResponse::InternalServerError().body("Error while deleting team!"),
     }
 }
