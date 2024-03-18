@@ -8,20 +8,20 @@ use diesel::{
     r2d2::{ConnectionManager, PooledConnection},
 };
 
-pub fn get_teams(connection: &mut PooledConnection<ConnectionManager<PgConnection>>) -> Vec<Team> {
+pub fn load_teams(connection: &mut PooledConnection<ConnectionManager<PgConnection>>) -> Vec<Team> {
     teams
         .load::<Team>(connection)
         .expect("Failed to get teams.")
 }
 
-pub fn get_team(
+pub fn find_team_by_id(
     connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
     team_id: i32,
 ) -> Option<Team> {
     teams.find(team_id).first::<Team>(connection).ok()
 }
 
-pub fn get_team_by_players(
+pub fn find_team_by_player_ids(
     connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
     data: NewTeam,
 ) -> Option<Team> {
@@ -40,7 +40,7 @@ pub fn get_team_by_players(
         .ok()
 }
 
-pub fn create_team(
+pub fn insert_team(
     connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
     data: NewTeam,
 ) -> Result<Team, diesel::result::Error> {
@@ -49,15 +49,15 @@ pub fn create_team(
         .get_result(connection)
 }
 
-pub fn create_or_get_team(
+pub fn find_or_insert_team(
     connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
     data: NewTeam,
 ) -> Result<Team, diesel::result::Error> {
-    let existing_team = get_team_by_players(connection, data.clone());
+    let existing_team = find_team_by_player_ids(connection, data.clone());
 
     match existing_team {
         Some(team) => Ok(team),
-        None => create_team(connection, data.clone()),
+        None => insert_team(connection, data.clone()),
     }
 }
 

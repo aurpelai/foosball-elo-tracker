@@ -8,7 +8,7 @@ use diesel::{
     r2d2::{ConnectionManager, PooledConnection},
 };
 
-pub fn get_players(
+pub fn load_players(
     connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
 ) -> Vec<Player> {
     players
@@ -16,27 +16,20 @@ pub fn get_players(
         .expect("Failed to get players.")
 }
 
-pub fn get_player(
+pub fn find_player_by_id(
     connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
     player_id: i32,
 ) -> Option<Player> {
     players.find(player_id).first::<Player>(connection).ok()
 }
 
-pub fn create_player(
+pub fn insert_player(
     connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
-    new_player: NewPlayer,
+    data: NewPlayer,
 ) -> Result<Player, diesel::result::Error> {
     diesel::insert_into(players)
-        .values(&new_player)
+        .values(&data)
         .get_result(connection)
-}
-
-pub fn delete_player(
-    connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
-    player_id: i32,
-) -> Result<usize, diesel::result::Error> {
-    diesel::delete(players.find(player_id)).execute(connection)
 }
 
 pub fn update_player(
@@ -46,4 +39,11 @@ pub fn update_player(
     diesel::update(players.find(player.id))
         .set(&player)
         .get_result(connection)
+}
+
+pub fn delete_player(
+    connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
+    player_id: i32,
+) -> Result<usize, diesel::result::Error> {
+    diesel::delete(players.find(player_id)).execute(connection)
 }
