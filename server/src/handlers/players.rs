@@ -5,16 +5,12 @@ use actix_web::{delete, get, post, put, web, HttpResponse};
 
 #[get("")]
 async fn get_all_players(db: web::Data<Database>) -> HttpResponse {
-    let mut connection = db.pool.get().unwrap();
-    let result = players::load_players(&mut connection);
-    HttpResponse::Ok().json(result)
+    HttpResponse::Ok().json(players::load_players(&mut db.pool.get().unwrap()))
 }
 
 #[post("")]
 async fn create_player(db: web::Data<Database>, data: web::Json<NewPlayer>) -> HttpResponse {
-    let mut connection = db.pool.get().unwrap();
-    let result = players::insert_player(&mut connection, data.into_inner());
-    match result {
+    match players::insert_player(&mut db.pool.get().unwrap(), &data.into_inner()) {
         Ok(player) => HttpResponse::Ok().json(player),
         Err(_) => HttpResponse::InternalServerError().body("Internal Server Error"),
     }
@@ -22,9 +18,7 @@ async fn create_player(db: web::Data<Database>, data: web::Json<NewPlayer>) -> H
 
 #[put("")]
 async fn update_player(db: web::Data<Database>, data: web::Json<Player>) -> HttpResponse {
-    let mut connection = db.pool.get().unwrap();
-    let result = players::update_player(&mut connection, data.into_inner());
-    match result {
+    match players::update_player(&mut db.pool.get().unwrap(), &data.into_inner()) {
         Ok(player) => HttpResponse::Ok().json(player),
         Err(_) => HttpResponse::InternalServerError().body("Internal Server Error"),
     }
@@ -32,12 +26,10 @@ async fn update_player(db: web::Data<Database>, data: web::Json<Player>) -> Http
 
 #[get("/{id}")]
 async fn get_player_by_id(db: web::Data<Database>, path: web::Path<i32>) -> HttpResponse {
-    let mut connection = db.pool.get().unwrap();
     let id = path.into_inner();
-    let result = players::find_player_by_id(&mut connection, id);
-    match result {
+    match players::find_player_by_id(&mut db.pool.get().unwrap(), &id) {
         Some(player) => HttpResponse::Ok().json(player),
-        None => HttpResponse::NotFound().body(format!("Could not find player with id: '{id}'")),
+        None => HttpResponse::NotFound().body(format!("Could not find player with id: '{0}'", &id)),
     }
 }
 
@@ -45,9 +37,7 @@ async fn get_player_by_id(db: web::Data<Database>, path: web::Path<i32>) -> Http
 
 #[delete("/{id}")]
 async fn delete_player_by_id(db: web::Data<Database>, path: web::Path<i32>) -> HttpResponse {
-    let mut connection = db.pool.get().unwrap();
-    let result = players::delete_player(&mut connection, path.into_inner());
-    match result {
+    match players::delete_player(&mut db.pool.get().unwrap(), &path.into_inner()) {
         Ok(result) => HttpResponse::Ok().json(result),
         Err(_) => HttpResponse::InternalServerError().body("Internal Server Error"),
     }

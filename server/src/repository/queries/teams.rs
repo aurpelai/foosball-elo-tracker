@@ -16,14 +16,14 @@ pub fn load_teams(connection: &mut PooledConnection<ConnectionManager<PgConnecti
 
 pub fn find_team_by_id(
     connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
-    team_id: i32,
+    team_id: &i32,
 ) -> Option<Team> {
     teams.find(team_id).first::<Team>(connection).ok()
 }
 
 pub fn find_team_by_player_ids(
     connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
-    data: NewTeam,
+    data: &NewTeam,
 ) -> Option<Team> {
     teams
         .filter(
@@ -42,28 +42,26 @@ pub fn find_team_by_player_ids(
 
 pub fn insert_team(
     connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
-    data: NewTeam,
+    data: &NewTeam,
 ) -> Result<Team, diesel::result::Error> {
     diesel::insert_into(teams)
-        .values(&data)
+        .values(data)
         .get_result(connection)
 }
 
 pub fn find_or_insert_team(
     connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
-    data: NewTeam,
+    data: &NewTeam,
 ) -> Result<Team, diesel::result::Error> {
-    let existing_team = find_team_by_player_ids(connection, data.clone());
-
-    match existing_team {
+    match find_team_by_player_ids(connection, &data) {
         Some(team) => Ok(team),
-        None => insert_team(connection, data.clone()),
+        None => insert_team(connection, &data),
     }
 }
 
 pub fn delete_team(
     connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
-    team_id: i32,
+    team_id: &i32,
 ) -> Result<usize, diesel::result::Error> {
     diesel::delete(teams.find(team_id)).execute(connection)
 }
