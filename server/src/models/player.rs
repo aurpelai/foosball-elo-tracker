@@ -6,7 +6,6 @@ use serde::{Deserialize, Serialize};
 pub struct Player {
     pub id: i32,
     pub name: String,
-    pub active: bool,
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone, Insertable)]
