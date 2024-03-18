@@ -9,6 +9,7 @@ pub fn configure_routes(cfg: &mut web::ServiceConfig) {
                 web::scope("/players")
                     .service(handlers::players::get_all_players)
                     .service(handlers::players::get_player_by_id)
+                    .service(handlers::players::get_all_teams_by_player_id)
                     .service(handlers::players::create_player)
                     .service(handlers::players::delete_player_by_id)
                     .service(handlers::players::update_player),

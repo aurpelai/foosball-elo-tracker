@@ -1,5 +1,8 @@
 use crate::models::player::{NewPlayer, Player};
-use crate::repository::{database::Database, queries::players};
+use crate::repository::{
+    database::Database,
+    queries::{players, teams},
+};
 
 use actix_web::{delete, get, post, put, web, HttpResponse};
 
@@ -33,12 +36,25 @@ async fn get_player_by_id(db: web::Data<Database>, path: web::Path<i32>) -> Http
     }
 }
 
-// TODO get all teams player has played in
-
 #[delete("/{id}")]
 async fn delete_player_by_id(db: web::Data<Database>, path: web::Path<i32>) -> HttpResponse {
     match players::delete_player(&mut db.pool.get().unwrap(), &path.into_inner()) {
         Ok(result) => HttpResponse::Ok().json(result),
         Err(_) => HttpResponse::InternalServerError().body("Error while deleting player!"),
+    }
+}
+
+#[get("/{id}/teams")]
+async fn get_all_teams_by_player_id(
+    db: web::Data<Database>,
+    player_id: web::Path<i32>,
+) -> HttpResponse {
+    match players::find_player_by_id(&mut db.pool.get().unwrap(), &player_id) {
+        Some(_) => HttpResponse::Ok().json(teams::find_teams_by_player_id(
+            &mut db.pool.get().unwrap(),
+            &player_id,
+        )),
+        None => HttpResponse::NotFound()
+            .body(format!("Could not find player with id '{0}'", &player_id)),
     }
 }

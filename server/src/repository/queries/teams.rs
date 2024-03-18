@@ -11,7 +11,7 @@ use diesel::{
 pub fn load_teams(connection: &mut PooledConnection<ConnectionManager<PgConnection>>) -> Vec<Team> {
     teams
         .load::<Team>(connection)
-        .expect("Failed to get teams.")
+        .expect("Failed to load teams.")
 }
 
 pub fn find_team_by_id(
@@ -19,6 +19,17 @@ pub fn find_team_by_id(
     team_id: &i32,
 ) -> Option<Team> {
     teams.find(team_id).first::<Team>(connection).ok()
+}
+
+pub fn find_teams_by_player_id(
+    connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
+    player_id: &i32,
+) -> Vec<Team> {
+    teams
+        .filter(player_one_id.eq(player_id))
+        .or_filter(player_two_id.eq(player_id))
+        .load::<Team>(connection)
+        .expect("Failed to load teams by player id '{player_id}.")
 }
 
 pub fn find_team_by_player_ids(

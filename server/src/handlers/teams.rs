@@ -16,8 +16,6 @@ async fn create_team(db: web::Data<Database>, data: web::Json<NewTeam>) -> HttpR
     }
 }
 
-// TODO allow searching for teams with player ids
-
 #[get("/{id}")]
 async fn get_team_by_id(db: web::Data<Database>, path: web::Path<i32>) -> HttpResponse {
     let id = &path.into_inner();
