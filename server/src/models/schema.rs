@@ -13,6 +13,7 @@ diesel::table! {
         id -> Int4,
         player_one_id -> Int4,
         player_two_id -> Int4,
+        name -> Nullable<Text>,
     }
 }
 

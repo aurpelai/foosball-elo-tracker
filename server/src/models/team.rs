@@ -7,6 +7,7 @@ pub struct Team {
     pub id: i32,
     pub player_one_id: i32,
     pub player_two_id: i32,
+    pub name: Option<String>,
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone, Insertable)]
@@ -14,4 +15,5 @@ pub struct Team {
 pub struct NewTeam {
     pub player_one_id: i32,
     pub player_two_id: i32,
+    pub name: Option<String>,
 }
