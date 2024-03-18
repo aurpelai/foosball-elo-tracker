@@ -29,7 +29,7 @@ pub fn find_teams_by_player_id(
         .filter(player_one_id.eq(player_id))
         .or_filter(player_two_id.eq(player_id))
         .load::<Team>(connection)
-        .expect("Failed to load teams by player id '{player_id}.")
+        .expect("Failed to load teams by player id '{player_id}'.")
 }
 
 pub fn find_team_by_player_ids(
