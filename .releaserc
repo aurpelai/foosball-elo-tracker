@@ -27,6 +27,10 @@
         "presetConfig": {
           "types": [
             {
+              "type": "build",
+              "hidden": true
+            },
+            {
               "type": "chore",
               "hidden": true
             },
