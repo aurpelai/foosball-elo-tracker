@@ -1,5 +1,7 @@
-use diesel::prelude::*;
-use diesel::r2d2::{self, ConnectionManager};
+use diesel::{
+    prelude::*,
+    r2d2::{self, ConnectionManager},
+};
 use dotenv::dotenv;
 
 pub type DBPool = r2d2::Pool<ConnectionManager<PgConnection>>;

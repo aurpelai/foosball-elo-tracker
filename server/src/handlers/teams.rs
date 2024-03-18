@@ -1,5 +1,5 @@
-use crate::repository::teams;
-use crate::{models::team::NewTeam, repository::database::Database};
+use crate::models::team::NewTeam;
+use crate::repository::{database::Database, queries::teams};
 
 use actix_web::{delete, get, post, web, HttpResponse};
 

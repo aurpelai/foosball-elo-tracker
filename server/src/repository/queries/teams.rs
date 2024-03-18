@@ -1,8 +1,12 @@
-use crate::models::schema::teams::dsl::*;
-use crate::models::team::{NewTeam, Team};
+use crate::models::{
+    schema::teams::dsl::*,
+    team::{NewTeam, Team},
+};
 
-use diesel::prelude::*;
-use diesel::r2d2::{ConnectionManager, PooledConnection};
+use diesel::{
+    prelude::*,
+    r2d2::{ConnectionManager, PooledConnection},
+};
 
 pub fn get_teams(connection: &mut PooledConnection<ConnectionManager<PgConnection>>) -> Vec<Team> {
     teams

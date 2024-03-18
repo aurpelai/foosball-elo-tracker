@@ -1,8 +1,6 @@
-use crate::repository::players;
-use crate::{
-    models::player::{NewPlayer, Player},
-    repository::database::Database,
-};
+use crate::models::player::{NewPlayer, Player};
+use crate::repository::{database::Database, queries::players};
+
 use actix_web::{delete, get, post, put, web, HttpResponse};
 
 #[get("")]

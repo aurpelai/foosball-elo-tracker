@@ -1,8 +1,12 @@
-use diesel::prelude::*;
-use diesel::r2d2::{ConnectionManager, PooledConnection};
+use crate::models::{
+    player::{NewPlayer, Player},
+    schema::players::dsl::*,
+};
 
-use crate::models::player::{NewPlayer, Player};
-use crate::models::schema::players::dsl::*;
+use diesel::{
+    prelude::*,
+    r2d2::{ConnectionManager, PooledConnection},
+};
 
 pub fn get_players(
     connection: &mut PooledConnection<ConnectionManager<PgConnection>>,

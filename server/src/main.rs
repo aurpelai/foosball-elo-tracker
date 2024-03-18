@@ -3,13 +3,13 @@ use diesel_migrations::{EmbeddedMigrations, MigrationHarness};
 use env_logger::Env;
 use serde::Serialize;
 
-#[macro_use]
-extern crate diesel_migrations;
-
 mod handlers;
 mod models;
 mod repository;
 mod routes;
+
+#[macro_use]
+extern crate diesel_migrations;
 
 #[derive(Serialize)]
 pub struct Response {
