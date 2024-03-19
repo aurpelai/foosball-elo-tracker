@@ -38,11 +38,9 @@ async fn get_all_matches_between_teams(
 
     match teams::find_team_by_id(connection, &data.team_one_id) {
         Some(_) => match teams::find_team_by_id(connection, &data.team_two_id) {
-            Some(_) => HttpResponse::Ok().json(matches::find_matches_between_teams(
-                connection,
-                &data.team_one_id,
-                &data.team_two_id,
-            )),
+            Some(_) => {
+                HttpResponse::Ok().json(matches::find_matches_between_teams(connection, &data))
+            }
             None => HttpResponse::NotFound().body(format!(
                 "Could not find team with id '{0}'",
                 &data.team_two_id

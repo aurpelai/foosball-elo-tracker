@@ -1,5 +1,5 @@
 use crate::models::{
-    r#match::{Match, NewMatch},
+    r#match::{Match, NewMatch, Rivalry},
     schema::matches::dsl::*,
 };
 
@@ -36,19 +36,18 @@ pub fn find_matches_by_team_id(
 
 pub fn find_matches_between_teams(
     connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
-    team_one_id: &i32,
-    team_two_id: &i32,
+    data: &Rivalry,
 ) -> Vec<Match> {
     matches
         .filter(
             winning_team_id
-                .eq(team_one_id)
-                .and(losing_team_id.eq(team_two_id)),
+                .eq(data.team_one_id)
+                .and(losing_team_id.eq(data.team_two_id)),
         )
         .or_filter(
             winning_team_id
-                .eq(team_two_id)
-                .and(losing_team_id.eq(team_one_id)),
+                .eq(data.team_two_id)
+                .and(losing_team_id.eq(data.team_one_id)),
         )
         .load::<Match>(connection)
         .expect("Failed to find matches between team ids '{team_one_id}' and '{team_two_id}'.")
