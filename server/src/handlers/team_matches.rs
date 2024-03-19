@@ -34,3 +34,11 @@ async fn delete(db: web::Data<Database>, match_id: web::Path<i32>) -> HttpRespon
         Err(_) => HttpResponse::InternalServerError().body("Error while deleting team match!"),
     }
 }
+
+#[get("/team/{id}")]
+async fn get_by_team_id(db: web::Data<Database>, team_id: web::Path<i32>) -> HttpResponse {
+    HttpResponse::Ok().json(team_matches::find_by_team_id(
+        &mut db.pool.get().unwrap(),
+        &team_id,
+    ))
+}

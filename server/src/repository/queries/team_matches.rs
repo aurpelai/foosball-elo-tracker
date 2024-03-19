@@ -27,6 +27,16 @@ pub fn find_by_id(
         .ok()
 }
 
+pub fn find_by_team_id(
+    connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
+    _team_id: &i32,
+) -> Vec<TeamMatch> {
+    team_matches
+        .filter(team_id.eq(_team_id))
+        .load::<TeamMatch>(connection)
+        .expect("Failed to find a team match by team id '{_team_id}.")
+}
+
 pub fn insert(
     connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
     data: &NewTeamMatch,
