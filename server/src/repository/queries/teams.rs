@@ -8,20 +8,20 @@ use diesel::{
     r2d2::{ConnectionManager, PooledConnection},
 };
 
-pub fn load_teams(connection: &mut PooledConnection<ConnectionManager<PgConnection>>) -> Vec<Team> {
+pub fn load_all(connection: &mut PooledConnection<ConnectionManager<PgConnection>>) -> Vec<Team> {
     teams
         .load::<Team>(connection)
         .expect("Failed to load teams.")
 }
 
-pub fn find_team_by_id(
+pub fn find_by_id(
     connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
     team_id: &i32,
 ) -> Option<Team> {
     teams.find(team_id).first::<Team>(connection).ok()
 }
 
-pub fn find_teams_by_player_id(
+pub fn find_by_player_id(
     connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
     player_id: &i32,
 ) -> Vec<Team> {
@@ -32,7 +32,7 @@ pub fn find_teams_by_player_id(
         .expect("Failed to load teams by player id '{player_id}'.")
 }
 
-pub fn find_team_by_player_ids(
+pub fn find_by_player_ids(
     connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
     data: &NewTeam,
 ) -> Option<Team> {
@@ -51,7 +51,7 @@ pub fn find_team_by_player_ids(
         .ok()
 }
 
-pub fn insert_team(
+pub fn insert(
     connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
     data: &NewTeam,
 ) -> Result<Team, diesel::result::Error> {
@@ -60,17 +60,17 @@ pub fn insert_team(
         .get_result(connection)
 }
 
-pub fn find_or_insert_team(
+pub fn find_or_insert(
     connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
     data: &NewTeam,
 ) -> Result<Team, diesel::result::Error> {
-    match find_team_by_player_ids(connection, &data) {
+    match find_by_player_ids(connection, &data) {
         Some(team) => Ok(team),
-        None => insert_team(connection, &data),
+        None => insert(connection, &data),
     }
 }
 
-pub fn delete_team(
+pub fn delete(
     connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
     team_id: &i32,
 ) -> Result<usize, diesel::result::Error> {

@@ -20,6 +20,14 @@ diesel::table! {
 }
 
 diesel::table! {
+    team_matches (id) {
+        id -> Int4,
+        team_id -> Int4,
+        match_id -> Int4,
+    }
+}
+
+diesel::table! {
     teams (id) {
         id -> Int4,
         player_one_id -> Int4,
@@ -28,8 +36,12 @@ diesel::table! {
     }
 }
 
+diesel::joinable!(team_matches -> matches (match_id));
+diesel::joinable!(team_matches -> teams (team_id));
+
 diesel::allow_tables_to_appear_in_same_query!(
     matches,
     players,
+    team_matches,
     teams,
 );
