@@ -1,7 +1,7 @@
 use crate::models::r#match::{NewMatch, Rivalry};
 use crate::repository::{
     database::Database,
-    queries::{matches, team_matches, teams},
+    queries::{matches, player_matches, team_matches, teams},
 };
 
 use actix_web::{delete, get, post, web, HttpResponse};
@@ -16,9 +16,18 @@ async fn create(db: web::Data<Database>, data: web::Json<NewMatch>) -> HttpRespo
     match matches::insert(&mut db.pool.get().unwrap(), &data) {
         Ok(match_value) => {
             match team_matches::insert_from_match(&mut db.pool.get().unwrap(), &match_value) {
-                Ok(_) => HttpResponse::Ok().json(match_value),
-                Err(_) => HttpResponse::InternalServerError().body("Error while creating match!"),
-            }
+                Ok(_) => HttpResponse::Ok().json(&match_value),
+                Err(_) => {
+                    HttpResponse::InternalServerError().body("Error while creating team match!")
+                }
+            };
+            match player_matches::insert_from_match(&mut db.pool.get().unwrap(), &match_value) {
+                Ok(_) => HttpResponse::Ok().json(&match_value),
+                Err(_) => {
+                    HttpResponse::InternalServerError().body("Error while creating player match!")
+                }
+            };
+            return HttpResponse::Ok().json(&match_value);
         }
         Err(_) => HttpResponse::InternalServerError().body("Error while creating match!"),
     }

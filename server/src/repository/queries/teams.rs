@@ -2,6 +2,7 @@ use crate::models::{
     schema::teams::dsl::*,
     team::{NewTeam, Team},
 };
+use crate::repository::queries::matches;
 
 use diesel::{
     prelude::*,
@@ -21,7 +22,30 @@ pub fn find_by_id(
     teams.find(team_id).first::<Team>(connection).ok()
 }
 
-pub fn find_by_player_id(
+pub fn filter_by_match_id(
+    connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
+    match_id: &i32,
+) -> Vec<Team> {
+    let mut values = vec![];
+    let r#match = matches::find_by_id(connection, &match_id);
+
+    if r#match.is_some() {
+        let data = r#match.unwrap();
+        let team_ids = vec![&data.winning_team_id, &data.losing_team_id];
+        let team_ids_iter = team_ids.iter();
+
+        for team_id in team_ids_iter {
+            match find_by_id(connection, &team_id) {
+                Some(data) => values.push(data),
+                None => break,
+            }
+        }
+    }
+
+    return values;
+}
+
+pub fn filter_by_player_id(
     connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
     player_id: &i32,
 ) -> Vec<Team> {
@@ -32,7 +56,7 @@ pub fn find_by_player_id(
         .expect("Failed to load teams by player id '{player_id}'.")
 }
 
-pub fn find_by_player_ids(
+pub fn find_by_both_player_ids(
     connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
     data: &NewTeam,
 ) -> Option<Team> {
@@ -64,7 +88,7 @@ pub fn find_or_insert(
     connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
     data: &NewTeam,
 ) -> Result<Team, diesel::result::Error> {
-    match find_by_player_ids(connection, &data) {
+    match find_by_both_player_ids(connection, &data) {
         Some(team) => Ok(team),
         None => insert(connection, &data),
     }

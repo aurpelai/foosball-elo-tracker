@@ -17,12 +17,12 @@ async fn create(db: web::Data<Database>, data: web::Json<NewTeamMatch>) -> HttpR
 }
 
 #[get("/{id}")]
-async fn get(db: web::Data<Database>, match_id: web::Path<i32>) -> HttpResponse {
-    match team_matches::find_by_id(&mut db.pool.get().unwrap(), &match_id) {
+async fn get(db: web::Data<Database>, team_match_id: web::Path<i32>) -> HttpResponse {
+    match team_matches::find_by_id(&mut db.pool.get().unwrap(), &team_match_id) {
         Some(value) => HttpResponse::Ok().json(value),
         None => HttpResponse::NotFound().body(format!(
             "Could not find team match with id '{0}'",
-            &match_id
+            &team_match_id
         )),
     }
 }
@@ -37,7 +37,7 @@ async fn delete(db: web::Data<Database>, match_id: web::Path<i32>) -> HttpRespon
 
 #[get("/team/{id}")]
 async fn get_by_team_id(db: web::Data<Database>, team_id: web::Path<i32>) -> HttpResponse {
-    HttpResponse::Ok().json(team_matches::find_by_team_id(
+    HttpResponse::Ok().json(team_matches::filter_by_team_id(
         &mut db.pool.get().unwrap(),
         &team_id,
     ))

@@ -47,11 +47,19 @@ async fn delete(db: web::Data<Database>, player_id: web::Path<i32>) -> HttpRespo
 #[get("/{id}/teams")]
 async fn get_teams(db: web::Data<Database>, player_id: web::Path<i32>) -> HttpResponse {
     match players::find_by_id(&mut db.pool.get().unwrap(), &player_id) {
-        Some(_) => HttpResponse::Ok().json(teams::find_by_player_id(
+        Some(_) => HttpResponse::Ok().json(teams::filter_by_player_id(
             &mut db.pool.get().unwrap(),
             &player_id,
         )),
         None => HttpResponse::NotFound()
             .body(format!("Could not find player with id '{0}'", &player_id)),
     }
+}
+
+#[get("/match/{id}")]
+async fn get_by_match_id(db: web::Data<Database>, match_id: web::Path<i32>) -> HttpResponse {
+    HttpResponse::Ok().json(players::filter_by_match_id(
+        &mut db.pool.get().unwrap(),
+        &match_id,
+    ))
 }

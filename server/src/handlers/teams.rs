@@ -49,3 +49,11 @@ async fn get_matches(db: web::Data<Database>, team_id: web::Path<i32>) -> HttpRe
         }
     }
 }
+
+#[get("/match/{id}")]
+async fn get_by_match_id(db: web::Data<Database>, match_id: web::Path<i32>) -> HttpResponse {
+    HttpResponse::Ok().json(teams::filter_by_match_id(
+        &mut db.pool.get().unwrap(),
+        &match_id,
+    ))
+}

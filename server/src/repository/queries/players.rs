@@ -2,6 +2,7 @@ use crate::models::{
     player::{NewPlayer, Player},
     schema::players::dsl::*,
 };
+use crate::repository::queries::teams;
 
 use diesel::{
     prelude::*,
@@ -19,6 +20,35 @@ pub fn find_by_id(
     player_id: &i32,
 ) -> Option<Player> {
     players.find(player_id).first::<Player>(connection).ok()
+}
+
+pub fn load_by_team(
+    connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
+    team_id: &i32,
+) -> Vec<Player> {
+    match teams::find_by_id(connection, team_id) {
+        Some(data) => players
+            .filter(id.eq(data.player_one_id).or(id.eq(data.player_two_id)))
+            .get_results(connection)
+            .expect("Failed to get players of team '{data.id}'"),
+        None => vec![],
+    }
+}
+
+pub fn filter_by_match_id(
+    connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
+    match_id: &i32,
+) -> Vec<Player> {
+    let mut values = vec![];
+    let teams = teams::filter_by_match_id(connection, &match_id);
+    let teams_iterator = teams.iter();
+
+    for team in teams_iterator {
+        let team_players = load_by_team(connection, &team.id);
+        values.extend_from_slice(&team_players)
+    }
+
+    return values;
 }
 
 pub fn insert(

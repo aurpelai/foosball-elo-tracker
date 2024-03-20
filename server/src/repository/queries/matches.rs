@@ -2,7 +2,7 @@ use crate::models::{
     r#match::{Match, NewMatch, Rivalry},
     schema::matches::dsl::*,
 };
-use crate::repository::queries::team_matches;
+use crate::repository::queries::{player_matches, team_matches};
 
 use diesel::{
     prelude::*,
@@ -66,5 +66,6 @@ pub fn delete(
     match_id: &i32,
 ) -> Result<usize, diesel::result::Error> {
     team_matches::delete_by_match_id(connection, match_id).ok();
+    player_matches::delete_by_match_id(connection, match_id).ok();
     return diesel::delete(matches.find(match_id)).execute(connection);
 }

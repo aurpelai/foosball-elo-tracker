@@ -3,6 +3,7 @@ use crate::models::{
     schema::team_matches::dsl::*,
     team_match::{NewTeamMatch, TeamMatch},
 };
+use crate::repository::queries::teams;
 
 use diesel::{
     prelude::*,
@@ -27,7 +28,7 @@ pub fn find_by_id(
         .ok()
 }
 
-pub fn find_by_team_id(
+pub fn filter_by_team_id(
     connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
     _team_id: &i32,
 ) -> Vec<TeamMatch> {
@@ -50,19 +51,19 @@ pub fn insert_from_match(
     connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
     data: &Match,
 ) -> Result<TeamMatch, diesel::result::Error> {
-    let team_matches_data = vec![
-        NewTeamMatch {
-            team_id: data.winning_team_id,
+    let mut values = vec![];
+    let teams = teams::filter_by_match_id(connection, &data.id);
+    let teams_iterator = teams.iter();
+
+    for team in teams_iterator {
+        values.push(NewTeamMatch {
+            team_id: team.id,
             match_id: data.id,
-        },
-        NewTeamMatch {
-            team_id: data.losing_team_id,
-            match_id: data.id,
-        },
-    ];
+        });
+    }
 
     diesel::insert_into(team_matches)
-        .values(team_matches_data)
+        .values(values)
         .get_result(connection)
 }
 
