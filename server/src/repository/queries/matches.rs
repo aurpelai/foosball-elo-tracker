@@ -1,8 +1,8 @@
-use crate::models::{
-    r#match::{Match, NewMatch, Rivalry},
+use crate::models::matches::{Match, NewMatch, Rivalry};
+use crate::repository::{
+    queries::{player_matches, team_matches},
     schema::matches::dsl::*,
 };
-use crate::repository::queries::{player_matches, team_matches};
 
 use diesel::{
     prelude::*,

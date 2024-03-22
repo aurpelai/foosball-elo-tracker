@@ -1,6 +1,5 @@
-pub mod r#match;
-pub mod player;
-pub mod player_match;
-pub mod schema;
-pub mod team;
-pub mod team_match;
+pub mod matches;
+pub mod player_matches;
+pub mod players;
+pub mod team_matches;
+pub mod teams;

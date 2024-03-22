@@ -1,4 +1,4 @@
-use crate::models::player::{NewPlayer, Player};
+use crate::models::players::{NewPlayer, Player};
 use crate::repository::{
     database::Database,
     queries::{players, teams},

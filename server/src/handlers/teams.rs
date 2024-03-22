@@ -1,4 +1,4 @@
-use crate::models::team::NewTeam;
+use crate::models::teams::NewTeam;
 use crate::repository::{
     database::Database,
     queries::{matches, teams},

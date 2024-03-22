@@ -1,8 +1,5 @@
-use crate::models::{
-    player::{NewPlayer, Player},
-    schema::players::dsl::*,
-};
-use crate::repository::queries::teams;
+use crate::models::players::{NewPlayer, Player};
+use crate::repository::{queries::teams, schema::players::dsl::*};
 
 use diesel::{
     prelude::*,

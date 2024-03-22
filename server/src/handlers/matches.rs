@@ -1,4 +1,4 @@
-use crate::models::r#match::{NewMatch, Rivalry};
+use crate::models::matches::{NewMatch, Rivalry};
 use crate::repository::{
     database::Database,
     queries::{matches, player_matches, team_matches, teams},

@@ -1,4 +1,4 @@
-use crate::models::player_match::NewPlayerMatch;
+use crate::models::player_matches::NewPlayerMatch;
 use crate::repository::{database::Database, queries::player_matches};
 
 use actix_web::{delete, get, post, web, HttpResponse};
