@@ -23,23 +23,24 @@ pub fn filter_by_match_id(
     connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
     match_id: &i32,
 ) -> Vec<Team> {
-    let mut values = vec![];
-    let r#match = matches::find_by_id(connection, &match_id);
+    let mut query_result = vec![];
 
-    if r#match.is_some() {
-        let data = r#match.unwrap();
-        let team_ids = vec![&data.winning_team_id, &data.losing_team_id];
-        let team_ids_iter = team_ids.iter();
+    match matches::find_by_id(connection, &match_id) {
+        Some(data) => {
+            let team_ids = vec![&data.winning_team_id, &data.losing_team_id];
+            let team_ids_iter = team_ids.iter();
 
-        for team_id in team_ids_iter {
-            match find_by_id(connection, &team_id) {
-                Some(data) => values.push(data),
-                None => break,
+            for team_id in team_ids_iter {
+                match find_by_id(connection, &team_id) {
+                    Some(data) => query_result.push(data),
+                    None => break,
+                }
             }
         }
+        None => (),
     }
 
-    return values;
+    return query_result;
 }
 
 pub fn filter_by_player_id(
