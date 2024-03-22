@@ -9,9 +9,9 @@ pub fn configure_routes(cfg: &mut web::ServiceConfig) {
                 web::scope("/matches")
                     .service(handlers::matches::create)
                     .service(handlers::matches::delete)
+                    .service(handlers::matches::get_by_rivalry)
                     .service(handlers::matches::get)
-                    .service(handlers::matches::get_all)
-                    .service(handlers::matches::get_by_rivalry),
+                    .service(handlers::matches::get_all),
             )
             .service(
                 web::scope("/players")

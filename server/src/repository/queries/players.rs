@@ -28,7 +28,7 @@ pub fn load_by_team(
 ) -> Vec<Player> {
     match teams::find_by_id(connection, team_id) {
         Some(data) => players
-            .filter(id.eq(data.player_one_id).or(id.eq(data.player_two_id)))
+            .filter(id.eq_any([data.player_one_id, data.player_two_id]))
             .get_results(connection)
             .expect("Failed to get players of team '{data.id}'"),
         None => vec![],

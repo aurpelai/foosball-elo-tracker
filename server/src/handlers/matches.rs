@@ -49,7 +49,7 @@ async fn get_by_rivalry(db: web::Data<Database>, data: web::Json<Rivalry>) -> Ht
 
     match teams::find_by_id(connection, &data.team_one_id) {
         Some(_) => match teams::find_by_id(connection, &data.team_two_id) {
-            Some(_) => HttpResponse::Ok().json(matches::find_by_team_ids(connection, &data)),
+            Some(_) => HttpResponse::Ok().json(matches::find_by_rivalry(connection, &data)),
             None => HttpResponse::NotFound().body(format!(
                 "Could not find team with id '{0}'",
                 &data.team_two_id
