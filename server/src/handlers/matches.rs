@@ -1,7 +1,7 @@
-use crate::models::matches::{NewMatch, Rivalry};
+use crate::models::matches::NewMatch;
 use crate::repository::{
     database::Database,
-    queries::{matches, player_matches, team_matches, teams},
+    queries::{matches, player_matches, team_matches},
 };
 
 use actix_web::{delete, get, post, web, HttpResponse};
@@ -44,22 +44,18 @@ async fn get(db: web::Data<Database>, match_id: web::Path<i32>) -> HttpResponse 
 }
 
 #[get("/rivalry")]
-async fn get_by_rivalry(db: web::Data<Database>, data: web::Json<Rivalry>) -> HttpResponse {
-    let connection = &mut db.pool.get().unwrap();
-
-    match teams::find_by_id(connection, &data.team_one_id) {
-        Some(_) => match teams::find_by_id(connection, &data.team_two_id) {
-            Some(_) => HttpResponse::Ok().json(matches::find_by_rivalry(connection, &data)),
-            None => HttpResponse::NotFound().body(format!(
-                "Could not find team with id '{0}'",
-                &data.team_two_id
-            )),
-        },
-        None => HttpResponse::NotFound().body(format!(
-            "Could not find team with id '{0}'",
-            &data.team_one_id
-        )),
+async fn get_by_rivalry(db: web::Data<Database>, team_ids: web::Json<Vec<i32>>) -> HttpResponse {
+    if team_ids.len() != 2 {
+        return HttpResponse::NotFound().body(format!(
+            "A rivalry must comprise of exactly two teams but tried to search with {0}!",
+            team_ids.len()
+        ));
     }
+
+    HttpResponse::Ok().json(matches::find_by_team_ids(
+        &mut db.pool.get().unwrap(),
+        &team_ids,
+    ))
 }
 
 #[delete("/{id}")]

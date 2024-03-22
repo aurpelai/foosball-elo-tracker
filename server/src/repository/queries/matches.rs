@@ -1,4 +1,4 @@
-use crate::models::matches::{Match, NewMatch, Rivalry};
+use crate::models::matches::{Match, NewMatch};
 use crate::repository::{
     queries::{player_matches, team_matches},
     schema::matches::dsl::*,
@@ -33,17 +33,15 @@ pub fn find_by_team_id(
         .expect("Failed to find matches by team id '{team_id}.")
 }
 
-pub fn find_by_rivalry(
+pub fn find_by_team_ids(
     connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
-    data: &Rivalry,
+    team_ids: &Vec<i32>,
 ) -> Vec<Match> {
-    let team_ids: Vec<i32> = vec![data.team_one_id, data.team_two_id];
-
     matches
-        .filter(winning_team_id.eq_any(&team_ids))
-        .filter(losing_team_id.eq_any(&team_ids))
+        .filter(winning_team_id.eq_any(team_ids))
+        .filter(losing_team_id.eq_any(team_ids))
         .load::<Match>(connection)
-        .expect("Failed to find matches between team ids '{team_one_id}' and '{team_two_id}'.")
+        .expect("Failed to find matches by multiple team ids.")
 }
 
 pub fn insert(

@@ -22,9 +22,3 @@ pub struct NewMatch {
     pub winning_team_score: Option<i16>,
     pub losing_team_score: Option<i16>,
 }
-
-#[derive(Deserialize, Serialize, Debug, Clone)]
-pub struct Rivalry {
-    pub team_one_id: i32,
-    pub team_two_id: i32,
-}
