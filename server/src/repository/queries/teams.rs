@@ -40,7 +40,7 @@ pub fn filter_by_match_id(
         None => (),
     }
 
-    return query_result;
+    query_result
 }
 
 pub fn filter_by_player_id(

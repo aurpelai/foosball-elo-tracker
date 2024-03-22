@@ -27,7 +27,7 @@ async fn create(db: web::Data<Database>, data: web::Json<NewMatch>) -> HttpRespo
                     HttpResponse::InternalServerError().body("Error while creating player match!")
                 }
             };
-            return HttpResponse::Ok().json(&match_value);
+            HttpResponse::Ok().json(&match_value)
         }
         Err(_) => HttpResponse::InternalServerError().body("Error while creating match!"),
     }

@@ -45,7 +45,7 @@ pub fn filter_by_match_id(
         query_result.extend_from_slice(&team_players)
     }
 
-    return query_result;
+    query_result
 }
 
 pub fn insert(

@@ -61,5 +61,5 @@ pub fn delete(
 ) -> Result<usize, diesel::result::Error> {
     team_matches::delete_by_match_id(connection, match_id).ok();
     player_matches::delete_by_match_id(connection, match_id).ok();
-    return diesel::delete(matches.find(match_id)).execute(connection);
+    diesel::delete(matches.find(match_id)).execute(connection)
 }
