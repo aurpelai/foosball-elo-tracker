@@ -58,17 +58,11 @@ pub fn find_by_both_player_ids(
     connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
     data: &NewTeam,
 ) -> Option<Team> {
+    let player_ids: Vec<i32> = vec![data.player_one_id, data.player_two_id];
+
     teams
-        .filter(
-            player_one_id
-                .eq(data.player_one_id)
-                .and(player_two_id.eq(data.player_two_id)),
-        )
-        .or_filter(
-            player_one_id
-                .eq(data.player_two_id)
-                .and(player_two_id.eq(data.player_one_id)),
-        )
+        .filter(player_one_id.eq_any(&player_ids))
+        .filter(player_two_id.eq_any(&player_ids))
         .first::<Team>(connection)
         .ok()
 }
