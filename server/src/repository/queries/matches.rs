@@ -37,11 +37,11 @@ pub fn find_by_rivalry(
     connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
     data: &Rivalry,
 ) -> Vec<Match> {
-    let values: Vec<i32> = vec![data.team_one_id, data.team_two_id];
+    let team_ids: Vec<i32> = vec![data.team_one_id, data.team_two_id];
 
     matches
-        .filter(winning_team_id.eq_any(&values))
-        .filter(losing_team_id.eq_any(&values))
+        .filter(winning_team_id.eq_any(&team_ids))
+        .filter(losing_team_id.eq_any(&team_ids))
         .load::<Match>(connection)
         .expect("Failed to find matches between team ids '{team_one_id}' and '{team_two_id}'.")
 }

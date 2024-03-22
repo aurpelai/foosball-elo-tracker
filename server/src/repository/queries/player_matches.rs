@@ -50,19 +50,19 @@ pub fn insert_from_match(
     connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
     data: &Match,
 ) -> Result<PlayerMatch, diesel::result::Error> {
-    let mut values = vec![];
+    let mut insert_values = vec![];
     let players = players::filter_by_match_id(connection, &data.id);
     let players_iterator = players.iter();
 
     for player in players_iterator {
-        values.push(NewPlayerMatch {
+        insert_values.push(NewPlayerMatch {
             player_id: player.id,
             match_id: data.id,
         });
     }
 
     diesel::insert_into(player_matches)
-        .values(values)
+        .values(insert_values)
         .get_result(connection)
 }
 

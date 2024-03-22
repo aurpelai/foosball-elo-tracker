@@ -36,16 +36,16 @@ pub fn filter_by_match_id(
     connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
     match_id: &i32,
 ) -> Vec<Player> {
-    let mut values = vec![];
+    let mut query_result = vec![];
     let teams = teams::filter_by_match_id(connection, &match_id);
     let teams_iterator = teams.iter();
 
     for team in teams_iterator {
         let team_players = load_by_team(connection, &team.id);
-        values.extend_from_slice(&team_players)
+        query_result.extend_from_slice(&team_players)
     }
 
-    return values;
+    return query_result;
 }
 
 pub fn insert(
