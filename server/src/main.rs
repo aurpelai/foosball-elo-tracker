@@ -1,12 +1,16 @@
 use actix_web::{get, web, App, HttpResponse, HttpServer, Responder, Result};
-use diesel_migrations::{EmbeddedMigrations, MigrationHarness};
+use dotenv::dotenv;
 use env_logger::Env;
 use serde::Serialize;
 
 mod handlers;
 mod models;
+mod queries;
 mod repository;
 mod routes;
+
+#[macro_use]
+extern crate diesel;
 
 #[macro_use]
 extern crate diesel_migrations;
@@ -17,13 +21,6 @@ pub struct Response {
     message: String,
 }
 
-type DB = diesel::pg::Pg;
-const MIGRATIONS: EmbeddedMigrations = embed_migrations!();
-
-fn run_migrations(connection: &mut impl MigrationHarness<DB>) {
-    let _ = connection.run_pending_migrations(MIGRATIONS);
-}
-
 #[get("/health")]
 async fn health() -> impl Responder {
     HttpResponse::Ok().json(Response {
@@ -32,29 +29,37 @@ async fn health() -> impl Responder {
     })
 }
 
-async fn not_found_error() -> Result<HttpResponse> {
+async fn route_not_found_error() -> Result<HttpResponse> {
     Ok(HttpResponse::NotFound().json(Response {
         status: "error".to_string(),
-        message: "Not Found".to_string(),
+        message: "Route not found".to_string(),
     }))
 }
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    dotenv().ok();
+
     let tracker_db = repository::database::Database::new();
-    run_migrations(&mut tracker_db.pool.get().unwrap());
     let app_data = web::Data::new(tracker_db);
 
     env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
     HttpServer::new(move || {
         App::new()
             .app_data(app_data.clone())
-            .configure(routes::configure_routes)
+            .configure(routes::configuration)
             .service(health)
-            .default_service(web::route().to(not_found_error))
+            .default_service(web::route().to(route_not_found_error))
             .wrap(actix_web::middleware::Logger::default())
     })
-    .bind(("0.0.0.0", 8080))?
+    .bind((
+        std::env::var("SERVER_ADDRESS")
+            .expect("Environment variable 'SERVER_ADDRESS' must be set!"),
+        std::env::var("SERVER_PORT")
+            .expect("Environment variable 'SERVER_PORT' must be set!")
+            .parse()
+            .unwrap(),
+    ))?
     .run()
     .await
 }

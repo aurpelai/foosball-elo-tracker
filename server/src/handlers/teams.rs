@@ -1,59 +1,64 @@
-use crate::models::teams::NewTeam;
-use crate::repository::{
-    database::Database,
-    queries::{matches, teams},
-};
+use crate::queries::{matches, teams};
+use crate::repository::database::Database;
 
 use actix_web::{delete, get, post, web, HttpResponse};
 
 #[get("")]
 async fn get_all(db: web::Data<Database>) -> HttpResponse {
-    HttpResponse::Ok().json(teams::load_all(&mut db.pool.get().unwrap()))
+    match teams::get_all_teams(&mut db.pool.get().unwrap()) {
+        Ok(result) => HttpResponse::Ok().json(result),
+        Err(_) => HttpResponse::InternalServerError().body("Error loading teams!"),
+    }
 }
 
 #[post("")]
-async fn create(db: web::Data<Database>, data: web::Json<NewTeam>) -> HttpResponse {
-    match teams::find_or_insert(&mut db.pool.get().unwrap(), &data) {
-        Ok(team) => HttpResponse::Ok().json(team),
+async fn create(db: web::Data<Database>, data: web::Json<Vec<i32>>) -> HttpResponse {
+    match teams::get_or_insert(&mut db.pool.get().unwrap(), &data) {
+        Ok(result) => HttpResponse::Ok().json(result),
         Err(_) => HttpResponse::InternalServerError().body("Error while creating team!"),
     }
 }
 
 #[get("/{id}")]
-async fn get(db: web::Data<Database>, team_id: web::Path<i32>) -> HttpResponse {
-    match teams::find_by_id(&mut db.pool.get().unwrap(), &team_id) {
-        Some(team) => HttpResponse::Ok().json(team),
-        None => {
-            HttpResponse::NotFound().body(format!("Could not find team with id '{0}'", &team_id))
-        }
+async fn get(db: web::Data<Database>, data: web::Path<i32>) -> HttpResponse {
+    match teams::get_team(&mut db.pool.get().unwrap(), &data) {
+        Ok(result) => HttpResponse::Ok().json(result),
+        Err(_) => HttpResponse::InternalServerError()
+            .body(format!("Error while getting team with id '{}'!", data)),
     }
 }
 
 #[delete("/{id}")]
-async fn delete(db: web::Data<Database>, team_id: web::Path<i32>) -> HttpResponse {
-    match teams::delete(&mut db.pool.get().unwrap(), &team_id) {
-        Ok(team) => HttpResponse::Ok().json(team),
+async fn delete(db: web::Data<Database>, data: web::Path<i32>) -> HttpResponse {
+    match teams::delete(&mut db.pool.get().unwrap(), &data) {
+        Ok(result) => HttpResponse::Ok().json(result),
         Err(_) => HttpResponse::InternalServerError().body("Error while deleting team!"),
     }
 }
 
 #[get("/{id}/matches")]
-async fn get_matches(db: web::Data<Database>, team_id: web::Path<i32>) -> HttpResponse {
-    match teams::find_by_id(&mut db.pool.get().unwrap(), &team_id) {
-        Some(_) => HttpResponse::Ok().json(matches::find_by_team_id(
-            &mut db.pool.get().unwrap(),
-            &team_id,
-        )),
-        None => {
-            HttpResponse::NotFound().body(format!("Could not find team with id '{0}'", &team_id))
-        }
+async fn get_matches(db: web::Data<Database>, data: web::Path<i32>) -> HttpResponse {
+    match matches::get_matches_by_team(&mut db.pool.get().unwrap(), &data) {
+        Ok(result) => HttpResponse::Ok().json(result),
+        Err(_) => HttpResponse::InternalServerError()
+            .body(format!("Error while fetching matches for team '{}'!", data)),
     }
 }
 
-#[get("/match/{id}")]
-async fn get_by_match_id(db: web::Data<Database>, match_id: web::Path<i32>) -> HttpResponse {
-    HttpResponse::Ok().json(teams::filter_by_match_id(
-        &mut db.pool.get().unwrap(),
-        &match_id,
-    ))
+#[get("/{id}/rating")]
+async fn get_rating(db: web::Data<Database>, data: web::Path<i32>) -> HttpResponse {
+    match teams::find_latest_team_rating(&mut db.pool.get().unwrap(), &data) {
+        Ok(result) => HttpResponse::Ok().json(result),
+        Err(_) => HttpResponse::InternalServerError()
+            .body(format!("Error while fetching rating for team '{}'!", data)),
+    }
+}
+
+pub fn configuration(cfg: &mut web::ServiceConfig) {
+    cfg.service(create);
+    cfg.service(delete);
+    cfg.service(get);
+    cfg.service(get_all);
+    cfg.service(get_rating);
+    cfg.service(get_matches);
 }

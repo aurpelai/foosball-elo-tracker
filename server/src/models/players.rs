@@ -1,15 +1,26 @@
-use diesel::{AsChangeset, Insertable, Queryable};
+use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
 
-#[derive(Queryable, Serialize, Deserialize, Debug, Clone, AsChangeset, Insertable)]
+#[derive(
+    AsChangeset,
+    Clone,
+    Debug,
+    Deserialize,
+    Identifiable,
+    Insertable,
+    PartialEq,
+    Queryable,
+    Selectable,
+    Serialize,
+)]
 #[diesel(table_name=crate::repository::schema::players)]
 pub struct Player {
     pub id: i32,
     pub name: String,
 }
 
-#[derive(Deserialize, Serialize, Debug, Clone, Insertable)]
+#[derive(Clone, Debug, Deserialize, Insertable, Serialize)]
 #[diesel(table_name=crate::repository::schema::players)]
-pub struct NewPlayer {
+pub struct PlayerUpsert {
     pub name: String,
 }

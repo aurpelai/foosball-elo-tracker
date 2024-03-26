@@ -1,19 +1,27 @@
-use diesel::{AsChangeset, Insertable, Queryable};
+use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
 
-#[derive(Queryable, Serialize, Deserialize, Debug, Clone, AsChangeset, Insertable)]
+#[derive(
+    AsChangeset,
+    Clone,
+    Debug,
+    Deserialize,
+    Eq,
+    Hash,
+    Identifiable,
+    PartialEq,
+    Queryable,
+    Selectable,
+    Serialize,
+)]
 #[diesel(table_name=crate::repository::schema::teams)]
 pub struct Team {
     pub id: i32,
-    pub player_one_id: i32,
-    pub player_two_id: i32,
     pub name: Option<String>,
 }
 
-#[derive(Deserialize, Serialize, Debug, Clone, Insertable)]
+#[derive(Clone, Debug, Deserialize, Insertable, Serialize)]
 #[diesel(table_name=crate::repository::schema::teams)]
-pub struct NewTeam {
-    pub player_one_id: i32,
-    pub player_two_id: i32,
+pub struct TeamUpsert {
     pub name: Option<String>,
 }

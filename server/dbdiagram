@@ -1,0 +1,53 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+
+Table matches {
+  id int [primary key]
+  timestamp timestamp [not null]
+  update_timestamp timestamp
+  winning_score int
+  losing_score int
+}
+
+Table player_results {
+  player_id int [ref: > players.id]
+  match_id int [ref: > matches.id]
+  result_type result_type
+  rating int [not null]
+  rating_delta int [not null]
+
+  indexes {
+    (player_id, match_id) [pk]
+  }
+}
+
+Table players {
+  id int [pk]
+  name string [not null]
+}
+
+Table team_results {
+  team_id int [ref: > teams.id]
+  match_id int [ref: > matches.id]
+  result_type result_type
+  rating int [not null]
+  rating_delta int [not null]
+
+  indexes {
+    (team_id, match_id) [pk]
+  }
+}
+
+Table team_players {
+  team_id int [ref: > teams.id]
+  player_id int [ref: > players.id]
+
+  indexes {
+    (team_id, player_id) [pk]
+  }
+}
+
+Table teams {
+  id int [primary key]
+  name string
+}
